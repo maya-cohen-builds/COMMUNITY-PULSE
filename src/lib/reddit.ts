@@ -31,26 +31,19 @@ export async function fetchSubredditPosts(
   sort: SortMode = "hot",
   limit = 25
 ): Promise<RedditPost[]> {
-  const url = `https://www.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&t=day`;
-  const res = await fetch(url, {
-    headers: { "User-Agent": "CommunityPulse/1.0" },
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const res = await fetch(`${supabaseUrl}/functions/v1/reddit-proxy`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${supabaseKey}`,
+      "apikey": supabaseKey,
+    },
+    body: JSON.stringify({ subreddit, sort, limit }),
   });
   if (!res.ok) throw new Error(`Failed to fetch r/${subreddit}`);
-  const data = await res.json();
-  return data.data.children.map((child: any) => ({
-    id: child.data.id,
-    title: child.data.title,
-    subreddit: child.data.subreddit,
-    author: child.data.author,
-    score: child.data.score,
-    num_comments: child.data.num_comments,
-    created_utc: child.data.created_utc,
-    permalink: child.data.permalink,
-    url: child.data.url,
-    selftext: child.data.selftext || "",
-    link_flair_text: child.data.link_flair_text,
-    thumbnail: child.data.thumbnail,
-  }));
+  return res.json();
 }
 
 export async function fetchAllSubreddits(
