@@ -20,9 +20,12 @@ serve(async (req) => {
       });
     }
 
-    const url = `https://www.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&t=day`;
+    const url = `https://old.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&t=day`;
     const res = await fetch(url, {
-      headers: { "User-Agent": "CommunityPulse/1.0 (server)" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; CommunityPulse/1.0; +https://community-pulse.app)",
+        "Accept": "application/json",
+      },
     });
 
     if (!res.ok) {
